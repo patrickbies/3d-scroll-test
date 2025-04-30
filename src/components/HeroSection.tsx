@@ -5,7 +5,38 @@ import Header from "./Header";
 import { useGLTF } from "@react-three/drei";
 import Starfield from "./Starfield";
 import { Group, MathUtils, Object3D, Vector3 } from "three";
-import { lerp } from "three/src/math/MathUtils.js";
+
+const Phage = ({progress} : {progress : number}) => {
+  const { scene } = useGLTF('/phage.glb');
+  const phage = useMemo(() => {
+    const g = scene.clone();
+    g.scale.setScalar(1);
+    return g;
+  }, [scene]);
+
+  const wrapper = useRef<Group>(null!);
+  const spin = useRef<Object3D>(null!);
+
+  useFrame((_, dt) => { 
+    spin.current.rotation.y += dt * 0.3;
+    wrapper.current.position.z = -1.9;
+
+    if (progress >= 950) {
+      const t = (progress - 950) / 500
+      wrapper.current.position.y = -3.09 -5*t;
+    } else {
+      wrapper.current.position.y = -3.09;
+    }
+  });
+
+  return (
+    <group ref={wrapper}>
+      <group ref={spin}>
+        <primitive object={phage} dispose={null} />
+      </group>
+    </group>
+  );
+}
 
 const DNA = ({ progress }: {progress : number})=> {
   const { scene } = useGLTF('/dna.glb');
@@ -40,22 +71,50 @@ const DNA = ({ progress }: {progress : number})=> {
   );
 }
 
-const ScrollCamera = ({ progress }: { progress: number }) => {
+function ScrollCamera({ progress }: { progress: number }) {
   const { camera } = useThree();
+
   useFrame(() => {
     if (progress <= 200) {
       const t = ((progress / 200) * Math.PI) / 2;
-      camera.rotation.x = -t / 2;
       camera.position.set(0, Math.cos(t), -1.5 * Math.sin(t));
+      camera.rotation.set(-t / 2, 0, 0);
     }
-    if (progress >= 550 && progress <= 750) {
-      const t = (progress - 550) / 200
 
-      
+    else if (progress <= 550) {
+      camera.position.set(0, 0, -1.5);
+      camera.rotation.set(-Math.PI / 4, 0, 0);
+    }
+
+    else if (progress <= 750) {
+      const n = (progress - 550) / 200;
+      camera.position.set(0, -3 * n, -1.5);
+      camera.rotation.set(-Math.PI / 4 * (1 - n), 0, 0);
+    }
+    else if (progress <= 950) {
+      camera.position.set(0, -3, -1.5);
+      camera.rotation.set(0, 0, 0);
+    }
+    else if (progress <= 1150) {
+      const t = (progress - 950) / 500;
+      const n = (progress - 950) / 200;
+      camera.position.y = -3 - 4*t;
+      camera.rotation.x = -n * Math.PI / 3
+    }
+    else if (progress <= 1450) {
+      console.log(progress)
+      const t = (progress - 1150) / 300;
+      camera.position.y = -3 - 8/5 - 3*t;
+      camera.rotation.x = -Math.PI / 3
+    }
+    else {
+
     }
   });
+
   return null;
 }
+
 
 const vh = window.innerHeight * 15;
 
@@ -95,14 +154,15 @@ const HeroSection = () => {
         <Suspense fallback={null}>
           <ScrollCamera progress={progress} />
           <Starfield
-            count={200}
+            count={400}
             minspeed={0.05}
             maxspeed={0.15}
-            halfSize={5}
+            halfSize={15}
             tiltDeg={20}
-            size={0.1}
+            size={0.2}
           />
           <DNA progress={progress} />
+          <Phage progress={progress} />
         </Suspense>
       </Canvas>
 
@@ -119,10 +179,10 @@ const HeroSection = () => {
         </div>
       )}
       {
-        progress >= 200 && (
+        progress >= 150 && (
           <div
           className="absolute top-[260px] pointer-events-none w-full h-screen justify-end flex items-center"
-          style={{opacity: progress < 350 ? (progress - 200) / 50 : (1 - (progress - 350) / 50)}}
+          style={{opacity: progress < 350 ? (progress - 150) / 50 : (1 - (progress - 350) / 50)}}
         >
           <h1 className="playfair-display-medium text-[1.5rem] w-[40vw] pr-[10vw] text-white">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi doloribus tempora vel cum sapiente veritatis hic, modi aperiam ipsum repudiandae enim dolorem, quasi obcaecati corrupti!
@@ -137,6 +197,30 @@ const HeroSection = () => {
           style={{opacity: progress < 550 ? (progress - 400) / 50 : (1 - (progress - 550) / 50)}}
         >
           <h1 className="playfair-display-medium text-[1.5rem] w-[40vw] pr-[10vw] text-white">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi doloribus tempora vel cum sapiente veritatis hic, modi aperiam ipsum repudiandae enim dolorem, quasi obcaecati corrupti!
+          </h1>
+        </div>
+        )
+      }
+      {
+        progress >= 750 && (
+          <div
+          className="fixed pointer-events-none w-full h-screen flex items-center"
+          style={{opacity: progress < 850 ? (progress - 750) / 50 : (1 - (progress - 850) / 50)}}
+        >
+          <h1 className="playfair-display-medium text-[1.5rem] w-[30vw] pl-[5vw] text-white">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi doloribus tempora vel cum sapiente veritatis hic, modi aperiam ipsum repudiandae enim dolorem, quasi obcaecati corrupti!
+          </h1>
+        </div>
+        )
+      }
+      {
+        progress >= 850 && (
+          <div
+          className="fixed pointer-events-none w-full h-screen flex justify-end items-center"
+          style={{opacity: progress < 950 ? (progress - 850) / 50 : (1 - (progress - 950) / 50)}}
+        >
+          <h1 className="playfair-display-medium text-[1.5rem] w-[30vw] pr-[5vw] text-white">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi doloribus tempora vel cum sapiente veritatis hic, modi aperiam ipsum repudiandae enim dolorem, quasi obcaecati corrupti!
           </h1>
         </div>

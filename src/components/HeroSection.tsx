@@ -7,7 +7,7 @@ import Starfield from "./Starfield";
 import { Group, MathUtils, Object3D, Vector3 } from "three";
 
 const Phage = ({progress} : {progress : number}) => {
-  const { scene } = useGLTF('/phage.glb');
+  const { scene } = useGLTF('/3d-scroll-test/phage.glb');
   const phage = useMemo(() => {
     const g = scene.clone();
     g.scale.setScalar(1);
@@ -39,7 +39,7 @@ const Phage = ({progress} : {progress : number}) => {
 }
 
 const DNA = ({ progress }: {progress : number})=> {
-  const { scene } = useGLTF('/dna.glb');
+  const { scene } = useGLTF('/3d-scroll-test/dna.glb');
   const helix = useMemo(() => {
     const g = scene.clone();
     g.scale.setScalar(0.1);

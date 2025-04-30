@@ -1,5 +1,4 @@
 import { shaderMaterial } from '@react-three/drei';
-import * as THREE from 'three';
 
 export const StarSpriteMaterial = shaderMaterial(
   {

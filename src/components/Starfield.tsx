@@ -65,6 +65,17 @@ export default function Starfield({
     attr.needsUpdate = true;
   });
 
+  const mat = useMemo(() => {
+    const m = new StarSpriteMaterial();
+    m.uniforms.uSize.value        = size;
+    m.uniforms.uAberration.value  = 0.08;
+    m.uniforms.uSoftness.value    = 0.48;
+    m.transparent                 = true;
+    m.depthWrite                  = false;
+    m.blending                    = THREE.AdditiveBlending;
+    return m;
+  }, [size]);
+
   return (
     <points ref={pts}>
       <bufferGeometry>
@@ -75,14 +86,10 @@ export default function Starfield({
         />
       </bufferGeometry>
 
-      <starSpriteMaterial
-    uSize={size}
-    uAberration={0.08}
-    uSoftness={0.48}
-    transparent
-    depthWrite={false}
-    blending={THREE.AdditiveBlending}
-  />
+      <primitive 
+        object={mat}
+        attach="material"
+      />
     </points>
   );
 }
